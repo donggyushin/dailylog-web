@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import Cookies from 'js-cookie';
 import { api } from '../utils/api';
 
@@ -6,6 +6,11 @@ interface User {
   id: string;
   email: string;
   name: string;
+}
+
+interface AuthResponse {
+  accessToken: string;
+  user: User;
 }
 
 interface AuthContextType {
@@ -32,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data, error } = await api.me();
 
         if (data && !error) {
-          setUser(data);
+          setUser(data as User);
         } else {
           // 토큰이 유효하지 않으면 삭제
           Cookies.remove('accessToken');
@@ -49,13 +54,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await api.login(email, password);
 
     if (data && !error) {
+      const authData = data as AuthResponse;
       // 백엔드에서 쿠키로 토큰을 설정한다고 가정
       // 만약 응답에 토큰이 포함되어 있다면:
-      if (data.accessToken) {
-        Cookies.set('accessToken', data.accessToken, { expires: 7 }); // 7일
+      if (authData.accessToken) {
+        Cookies.set('accessToken', authData.accessToken, { expires: 7 }); // 7일
       }
 
-      setUser(data.user);
+      setUser(authData.user);
       return { success: true };
     }
 
@@ -66,12 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await api.signup(email, password, name);
 
     if (data && !error) {
+      const authData = data as AuthResponse;
       // 회원가입 후 자동 로그인
-      if (data.accessToken) {
-        Cookies.set('accessToken', data.accessToken, { expires: 7 });
+      if (authData.accessToken) {
+        Cookies.set('accessToken', authData.accessToken, { expires: 7 });
       }
 
-      setUser(data.user);
+      setUser(authData.user);
       return { success: true };
     }
 

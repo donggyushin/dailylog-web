@@ -13,9 +13,9 @@ async function request<T>(
 ): Promise<ApiResponse<T>> {
   const token = Cookies.get('accessToken');
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   // 토큰이 있으면 헤더에 추가

@@ -38,18 +38,18 @@ clean:
 
 # Docker commands
 docker-build:
-	docker-compose build
+	docker compose build
 
 docker-up:
-	docker-compose up -d
+	docker compose up -d
 	@echo "Application is running at http://localhost:8080"
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 docker-logs:
-	docker-compose logs -f
+	docker compose logs -f
 
 docker-clean:
-	docker-compose down -v --rmi all
+	docker compose down -v --rmi all
 	docker system prune -f
