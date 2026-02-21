@@ -4,12 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React + TypeScript web application built with Vite. The project is currently in its initial setup phase with minimal boilerplate code.
+**Daily Log** is an AI-powered journaling service that helps users create emotional and literary diary entries through conversational interaction.
+
+### Service Concept
+
+- **AI Conversation-Based Journaling**: Users chat with an AI assistant that helps them reflect on their day
+- **Automatic Diary Generation**: After the conversation, AI automatically writes a beautifully crafted diary entry
+- **AI-Generated Thumbnails**: Optionally generates thematic images that match the diary's mood and content
+- **Literary & Emotional Writing**: AI acts as a skilled literary writer, creating emotionally rich and poetic entries
+- **Warm & Comforting Design**: The entire service should feel warm, comforting, and emotionally supportive
+
+### Technical Stack
+
+This is a React + TypeScript web application built with Vite. The backend is already implemented separately.
 
 ## Build Commands
 
+### NPM Scripts
 ```bash
-# Development server with hot module replacement
+# Development server with hot module replacement (Port 5173)
 npm run dev
 
 # Production build (runs TypeScript compiler check first, then builds)
@@ -20,6 +33,29 @@ npm run preview
 
 # Lint code with ESLint
 npm run lint
+```
+
+### Makefile Commands (Recommended)
+```bash
+# Development
+make dev            # Start development server
+make build          # Build for production
+make lint           # Run linter
+
+# Docker (Production - Port 8080)
+make docker-build   # Build Docker image
+make docker-up      # Start container in background
+make docker-down    # Stop container
+make docker-logs    # View container logs
+make docker-clean   # Remove all Docker artifacts
+```
+
+## Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000  # Backend API URL
 ```
 
 ## Tech Stack
@@ -33,12 +69,30 @@ npm run lint
 
 ```
 src/
-├── main.tsx          # Application entry point, renders root component
-├── App.tsx           # Main App component
-├── App.css           # App component styles
+├── components/       # Reusable components
+│   └── ProtectedRoute.tsx    # Route guard for authenticated pages
+├── contexts/         # React Context providers
+│   └── AuthContext.tsx       # Authentication state management
+├── pages/            # Page components
+│   ├── LoginPage.tsx         # Login page
+│   ├── SignupPage.tsx        # Signup page
+│   ├── HomePage.tsx          # Main dashboard (authenticated)
+│   ├── AuthPages.css         # Login/Signup styles
+│   └── HomePage.css          # Home page styles
+├── utils/            # Utility functions
+│   └── api.ts               # API communication layer
+├── main.tsx          # Application entry point with AuthProvider
+├── App.tsx           # Router configuration
 ├── index.css         # Global styles
 └── assets/           # Static assets
 ```
+
+## Authentication
+
+- **Cookie-based authentication**: Uses `js-cookie` to manage `accessToken` in cookies
+- **Protected routes**: Unauthenticated users are automatically redirected to `/login`
+- **AuthContext**: Global authentication state accessible via `useAuth()` hook
+- **API integration**: All API calls automatically include authentication headers
 
 ## TypeScript Configuration
 
@@ -59,9 +113,25 @@ Uses ESLint flat config format (`eslint.config.js`) with:
 
 The `dist` directory is globally ignored.
 
+## Design Philosophy
+
+When implementing UI/UX features, keep these principles in mind:
+
+- **Warm & Comforting**: Use soft colors, gentle gradients, and rounded corners
+- **Emotionally Supportive**: The interface should feel like a caring companion, not a cold tool
+- **Literary & Poetic**: Typography and language should feel refined and artistic
+- **Calming Experience**: Avoid harsh contrasts, use smooth transitions and subtle animations
+- **Personal & Intimate**: Design should encourage personal reflection and emotional expression
+
+Color palette suggestions:
+- Soft purples and blues (current gradient: `#667eea` to `#764ba2`)
+- Warm whites and light grays for backgrounds
+- Gentle shadows instead of hard borders
+
 ## Development Notes
 
 - The project uses React 19 with StrictMode enabled
 - Vite provides Fast Refresh via `@vitejs/plugin-react` using Babel
 - Module resolution is set to "bundler" mode for optimal Vite compatibility
 - JSX transformation uses the modern `react-jsx` runtime (no React import needed)
+- Backend API is implemented separately and should be running for full functionality
