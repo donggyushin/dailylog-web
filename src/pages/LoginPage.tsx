@@ -32,11 +32,11 @@ export function LoginPage() {
     <div className="auth-container">
       <div className="auth-card">
         <h1>Daily Log</h1>
-        <h2>Login</h2>
+        <h2>로그인</h2>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">이메일</label>
             <input
               id="email"
               type="email"
@@ -49,7 +49,7 @@ export function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">비밀번호</label>
             <input
               id="password"
               type="password"
@@ -64,14 +64,14 @@ export function LoginPage() {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="btn-primary" disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 
         <div className="auth-footer">
           <p>
-            Don't have an account?{' '}
-            <Link to="/signup" className="auth-link">Sign up</Link>
+            계정이 없으신가요?{' '}
+            <Link to="/signup" className="auth-link">회원가입</Link>
           </p>
         </div>
       </div>

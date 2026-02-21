@@ -16,7 +16,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         alignItems: 'center',
         height: '100vh'
       }}>
-        <p>Loading...</p>
+        <p>로딩 중...</p>
       </div>
     );
   }

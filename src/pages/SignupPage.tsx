@@ -20,13 +20,13 @@ export function SignupPage() {
 
     // 비밀번호 확인
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('비밀번호가 일치하지 않습니다');
       return;
     }
 
     // 비밀번호 최소 길이 확인
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('비밀번호는 최소 6자 이상이어야 합니다');
       return;
     }
 
@@ -47,24 +47,24 @@ export function SignupPage() {
     <div className="auth-container">
       <div className="auth-card">
         <h1>Daily Log</h1>
-        <h2>Sign Up</h2>
+        <h2>회원가입</h2>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">이름</label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
+              placeholder="이름을 입력하세요"
               required
               disabled={isLoading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">이메일</label>
             <input
               id="email"
               type="email"
@@ -77,7 +77,7 @@ export function SignupPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">비밀번호</label>
             <input
               id="password"
               type="password"
@@ -90,7 +90,7 @@ export function SignupPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">비밀번호 확인</label>
             <input
               id="confirmPassword"
               type="password"
@@ -105,14 +105,14 @@ export function SignupPage() {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="btn-primary" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Sign Up'}
+            {isLoading ? '가입 중...' : '회원가입'}
           </button>
         </form>
 
         <div className="auth-footer">
           <p>
-            Already have an account?{' '}
-            <Link to="/login" className="auth-link">Login</Link>
+            이미 계정이 있으신가요?{' '}
+            <Link to="/login" className="auth-link">로그인</Link>
           </p>
         </div>
       </div>
