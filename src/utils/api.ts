@@ -32,7 +32,7 @@ async function refreshAccessToken(): Promise<boolean> {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ refreshToken }),
-                credentials: 'include',
+                // credentials: 'include',
             });
 
             if (!response.ok) {
@@ -90,7 +90,7 @@ async function request<T>(
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
             headers,
-            credentials: 'include', // 쿠키 자동 전송
+            // credentials: 'include', // 쿠키 자동 전송
         });
 
         // 401 에러 처리 (인증 실패)
