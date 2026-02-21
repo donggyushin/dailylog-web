@@ -1,15 +1,78 @@
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 interface ApiResponse<T = any> {
     data?: T;
     error?: string;
 }
 
+// 토큰 갱신 중인지 추적 (중복 요청 방지)
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+// 토큰 갱신 함수
+async function refreshAccessToken(): Promise<boolean> {
+    // 이미 갱신 중이면 해당 Promise 반환
+    if (isRefreshing && refreshPromise) {
+        return refreshPromise;
+    }
+
+    isRefreshing = true;
+    refreshPromise = (async () => {
+        try {
+            const refreshToken = Cookies.get('refreshToken');
+            if (!refreshToken) {
+                return false;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/v1/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                return false;
+            }
+
+            const data = await response.json();
+
+            // 새 토큰 저장
+            if (data.accessToken) {
+                Cookies.set('accessToken', data.accessToken, { expires: 7 });
+            }
+            if (data.refreshToken) {
+                Cookies.set('refreshToken', data.refreshToken);
+            }
+
+            return true;
+        } catch {
+            return false;
+        } finally {
+            isRefreshing = false;
+            refreshPromise = null;
+        }
+    })();
+
+    return refreshPromise;
+}
+
+// 로그아웃 처리
+function handleLogout() {
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+    // 로그인 페이지로 리다이렉트
+    window.location.href = '/login';
+}
+
 async function request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    isRetry = false
 ): Promise<ApiResponse<T>> {
     const token = Cookies.get('accessToken');
 
@@ -30,6 +93,21 @@ async function request<T>(
             credentials: 'include', // 쿠키 자동 전송
         });
 
+        // 401 에러 처리 (인증 실패)
+        if (response.status === 401 && !isRetry) {
+            // 토큰 갱신 시도
+            const refreshed = await refreshAccessToken();
+
+            if (refreshed) {
+                // 토큰 갱신 성공 - 원래 요청 재시도
+                return request<T>(endpoint, options, true);
+            } else {
+                // 토큰 갱신 실패 - 로그아웃
+                handleLogout();
+                return { error: 'Session expired. Please login again.' };
+            }
+        }
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -45,7 +123,7 @@ async function request<T>(
 export const api = {
     // 로그인
     login: async (email: string, password: string) => {
-        return request('/api/login', {
+        return request('/api/v1/login', {
             method: 'POST',
             body: JSON.stringify({ email, password }),
         });
