@@ -63,6 +63,7 @@ VITE_API_BASE_URL=http://localhost:8000  # Backend API URL
 - **React 19.2** - UI framework
 - **TypeScript 5.9** - Type safety
 - **Vite 7.3** - Build tool and dev server
+- **Tailwind CSS 3.4** - Utility-first CSS framework
 - **ESLint 9** - Linting with flat config format
 
 ## Project Structure
@@ -70,9 +71,14 @@ VITE_API_BASE_URL=http://localhost:8000  # Backend API URL
 ```
 src/
 ├── components/       # Reusable components
+│   ├── ui/                   # UI components (Tailwind-based)
+│   │   ├── Button.tsx        # Button component (brutalist design)
+│   │   ├── Input.tsx         # Input component with labels
+│   │   └── ThemeToggle.tsx   # Theme switcher (light/dark mode)
 │   └── ProtectedRoute.tsx    # Route guard for authenticated pages
 ├── contexts/         # React Context providers
-│   └── AuthContext.tsx       # Authentication state management
+│   ├── AuthContext.tsx       # Authentication state management
+│   └── ThemeContext.tsx      # Theme state management (light/dark)
 ├── pages/            # Page components
 │   ├── LoginPage.tsx         # Login page
 │   ├── SignupPage.tsx        # Signup page
@@ -80,16 +86,19 @@ src/
 │   ├── AuthPages.css         # Login/Signup styles
 │   └── HomePage.css          # Home page styles
 ├── utils/            # Utility functions
-│   └── api.ts               # API communication layer
-├── main.tsx          # Application entry point with AuthProvider
+│   └── api.ts               # API communication layer with token refresh
+├── main.tsx          # Application entry point with providers
 ├── App.tsx           # Router configuration
-├── index.css         # Global styles
+├── index.css         # Global styles (Tailwind directives)
 └── assets/           # Static assets
 ```
 
 ## Authentication
 
-- **Cookie-based authentication**: Uses `js-cookie` to manage `accessToken` in cookies
+- **Cookie-based authentication**: Uses `js-cookie` to manage `accessToken` and `refreshToken` in cookies
+- **Automatic token refresh**: When API returns 401, automatically calls `/api/v1/refresh` to renew tokens
+- **Retry logic**: Failed requests are retried once after successful token refresh
+- **Auto-logout**: If token refresh fails, automatically logs out the user
 - **Protected routes**: Unauthenticated users are automatically redirected to `/login`
 - **AuthContext**: Global authentication state accessible via `useAuth()` hook
 - **API integration**: All API calls automatically include authentication headers
@@ -115,27 +124,78 @@ The `dist` directory is globally ignored.
 
 ## Design Philosophy
 
+**Design Inspiration**: [Oh Lolly Day](https://oh-lolly-day.com/index.html) - Brutalist/minimal aesthetic with a rough, handcrafted feel.
+
 When implementing UI/UX features, keep these principles in mind:
 
-- **Warm & Comforting**: Use soft colors, gentle gradients, and rounded corners
-- **Emotionally Supportive**: The interface should feel like a caring companion, not a cold tool
-- **Literary & Poetic**: Typography and language should feel refined and artistic
-- **Calming Experience**: Avoid harsh contrasts, use smooth transitions and subtle animations
+- **Rough & Minimal**: Sharp edges, thick borders, no rounded corners, no shadows
+- **High Contrast**: Clear visual hierarchy with strong black/white contrast
+- **Emotionally Supportive**: Despite the brutalist aesthetic, the interface should still feel warm and supportive
+- **Literary & Poetic**: Typography should feel refined - serif headings, uppercase bold labels
+- **Intentional Simplicity**: Every element has a purpose, no unnecessary decorations
 - **Personal & Intimate**: Design should encourage personal reflection and emotional expression
 
-### Current Color Palette (Warm & Cozy Theme)
+### Design System
 
-Primary colors:
-- **Main gradient**: `#FFE5D9` → `#FEC89A` (warm cream to peachy orange)
-- **Accent color**: `#E07856` (warm terracotta)
-- **Button gradient**: `#E07856` → `#D85F44` (warm orange-coral)
-- **Background**: `#FFF5F0` → `#FFE5D9` (soft cream gradient)
+**Core Principles:**
+- **NO rounded corners** (`rounded-none` everywhere)
+- **NO shadows** (no `shadow-*` classes)
+- **2px borders everywhere** (`border-2`)
+- **Uppercase bold labels** for form fields
+- **Serif font** for headings (font-serif)
+- **Simple separator lines** instead of decorative elements
+- **Underlined links** with hover effects
 
-Design characteristics:
-- Peachy, warm tones that evoke comfort and emotional warmth
-- Soft cream and terracotta colors for a cozy, journal-like feel
-- Gentle shadows instead of hard borders
-- Rounded corners throughout
+**Typography:**
+- Headings: `font-serif font-bold` with tight tracking
+- Labels: `font-bold uppercase tracking-wider`
+- Body text: Default sans-serif
+- Links: Underlined with `underline hover:no-underline`
+
+### Current Color Palette (Brutalist Minimal Theme)
+
+**Light Mode (Natural Palette):**
+```javascript
+natural: {
+  50: '#FAFAF8',   // Almost white
+  100: '#F5F5F0',  // Cream paper
+  200: '#E8E8E0',  // Beige
+  300: '#D4D4C8',  // Light gray-beige
+  400: '#B8B8A8',  // Medium beige
+  500: '#9C9C88',  // Neutral beige
+  600: '#6B6B58',  // Dark beige
+  700: '#4A4A38',  // Very dark beige
+  800: '#1F1F1B',  // Almost black
+  900: '#0A0A08',  // Pure black
+}
+
+accent: {
+  cream: '#F5F5F0',  // Background color
+}
+```
+
+**Dark Mode (High Contrast Enhancement):**
+```javascript
+dark: {
+  text: '#F5F5F0',      // Bright cream (for readable text)
+  border: '#E8E8E0',    // Bright beige (for visible borders)
+  bg: '#0A0A08',        // Deep black (background)
+  card: '#1F1F1B',      // Card background (slightly lighter than bg)
+}
+```
+
+**Usage Examples:**
+- Background: `bg-accent-cream dark:bg-dark-bg`
+- Text: `text-natural-900 dark:text-dark-text`
+- Borders: `border-2 border-natural-900 dark:border-dark-border`
+- Cards: `bg-white dark:bg-dark-card`
+- Buttons: `bg-natural-900 dark:bg-dark-text text-white dark:text-dark-bg`
+
+**Theme Switching:**
+- ThemeContext provides light/dark mode toggle
+- Persists to localStorage
+- Respects system preference by default
+- ThemeToggle component in top-right corner (sun/moon icons)
 
 ### Language
 

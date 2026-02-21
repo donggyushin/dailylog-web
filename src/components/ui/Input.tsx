@@ -1,5 +1,4 @@
 import { InputHTMLAttributes, forwardRef } from 'react';
-import { motion } from 'framer-motion';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -15,34 +14,29 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-neutral-700 dark:text-sepia-300 mb-3 transition-colors"
+            className="block text-sm font-bold text-natural-900 dark:text-dark-text mb-3 uppercase tracking-wider"
           >
             {label}
           </label>
         )}
-        <motion.input
+        <input
           ref={ref}
           id={inputId}
           className={`
-            w-full px-4 py-3.5 rounded-xl border-2 border-neutral-200 dark:border-sepia-700
-            bg-white dark:bg-sepia-800 text-neutral-900 dark:text-sepia-100 placeholder-neutral-400 dark:placeholder-sepia-500
-            transition-all duration-200
-            focus:border-warm-400 dark:focus:border-sepia-600 focus:ring-4 focus:ring-warm-400/10 dark:focus:ring-sepia-600/20 focus:outline-none
-            disabled:bg-neutral-50 dark:disabled:bg-sepia-900 disabled:text-neutral-500 dark:disabled:text-sepia-600 disabled:cursor-not-allowed
-            ${error ? 'border-red-400 dark:border-red-700 focus:border-red-400 dark:focus:border-red-700 focus:ring-red-400/10 dark:focus:ring-red-700/20' : ''}
+            w-full px-4 py-3 border-2 border-natural-900 dark:border-dark-border
+            bg-white dark:bg-dark-bg text-natural-900 dark:text-dark-text placeholder-natural-400 dark:placeholder-natural-500
+            transition-colors
+            focus:border-natural-700 dark:focus:border-dark-border focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-natural-900 dark:focus:ring-dark-border
+            disabled:bg-natural-100 dark:disabled:bg-dark-card disabled:text-natural-500 dark:disabled:text-natural-600 disabled:cursor-not-allowed
+            ${error ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:focus:border-red-400 focus:ring-red-600 dark:focus:ring-red-400' : ''}
             ${className}
           `}
-          whileFocus={{ scale: 1.01 }}
           {...props}
         />
         {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-2 text-sm text-red-600 dark:text-red-400 transition-colors"
-          >
+          <p className="mt-2 text-sm text-red-700 dark:text-red-400">
             {error}
-          </motion.p>
+          </p>
         )}
       </div>
     );

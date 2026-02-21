@@ -22,11 +22,10 @@
   }
 
   body {
-    @apply min-h-screen text-neutral-800 dark:text-sepia-200 bg-white dark:bg-sepia-950;
+    @apply min-h-screen text-natural-900 dark:text-dark-text bg-accent-cream dark:bg-dark-bg;
     font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     line-height: 1.7;
     font-weight: 400;
-    transition: color 300ms, background-color 300ms;
   }
 
   #root {
@@ -34,10 +33,9 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply leading-tight text-neutral-900 dark:text-sepia-100;
+    @apply leading-tight text-natural-900 dark:text-dark-text;
     font-family: 'Noto Serif KR', serif;
     font-weight: 600;
-    transition: color 300ms;
   }
 
   h1 {
