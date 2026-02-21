@@ -61,7 +61,7 @@ export const api = {
 
     // 현재 유저 정보 가져오기
     me: async () => {
-        return request('/api/me');
+        return request('/api/v1/me');
     },
 
     // 로그아웃

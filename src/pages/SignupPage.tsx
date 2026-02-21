@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import './AuthPages.css';
 
 export function SignupPage() {
-    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,7 +31,7 @@ export function SignupPage() {
 
         setIsLoading(true);
 
-        const { success, error: signupError } = await signup(email, password, name);
+        const { success, error: signupError } = await signup(email, password);
 
         if (success) {
             navigate('/');
@@ -50,18 +49,6 @@ export function SignupPage() {
                 <h2>회원가입</h2>
 
                 <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="name">이름</label>
-                        <input
-                            id="name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="이름을 입력하세요"
-                            required
-                            disabled={isLoading}
-                        />
-                    </div>
 
                     <div className="form-group">
                         <label htmlFor="email">이메일</label>

@@ -10,14 +10,14 @@ interface User {
 
 interface AuthResponse {
     accessToken: string;
-    user: User;
+    refreshToken: string;
 }
 
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-    signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+    signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
 }
 
@@ -59,9 +59,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // 만약 응답에 토큰이 포함되어 있다면:
             if (authData.accessToken) {
                 Cookies.set('accessToken', authData.accessToken, { expires: 7 }); // 7일
+                Cookies.set('refreshToken', authData.refreshToken);
             }
 
-            setUser(authData.user);
+            // setUser(authData.user);
             return { success: true };
         }
 
@@ -76,9 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // 회원가입 후 자동 로그인
             if (authData.accessToken) {
                 Cookies.set('accessToken', authData.accessToken, { expires: 7 });
+                Cookies.set('refreshToken', authData.refreshToken);
             }
 
-            setUser(authData.user);
+            // setUser(authData.user);
             return { success: true };
         }
 
