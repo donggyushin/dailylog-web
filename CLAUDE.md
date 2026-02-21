@@ -123,10 +123,25 @@ When implementing UI/UX features, keep these principles in mind:
 - **Calming Experience**: Avoid harsh contrasts, use smooth transitions and subtle animations
 - **Personal & Intimate**: Design should encourage personal reflection and emotional expression
 
-Color palette suggestions:
-- Soft purples and blues (current gradient: `#667eea` to `#764ba2`)
-- Warm whites and light grays for backgrounds
+### Current Color Palette (Warm & Cozy Theme)
+
+Primary colors:
+- **Main gradient**: `#FFE5D9` → `#FEC89A` (warm cream to peachy orange)
+- **Accent color**: `#E07856` (warm terracotta)
+- **Button gradient**: `#E07856` → `#D85F44` (warm orange-coral)
+- **Background**: `#FFF5F0` → `#FFE5D9` (soft cream gradient)
+
+Design characteristics:
+- Peachy, warm tones that evoke comfort and emotional warmth
+- Soft cream and terracotta colors for a cozy, journal-like feel
 - Gentle shadows instead of hard borders
+- Rounded corners throughout
+
+### Language
+
+- **Primary language**: Korean (한국어)
+- All UI text, error messages, and user-facing content should be in Korean
+- Keep the service name "Daily Log" in English as the brand name
 
 ## Development Notes
 
