@@ -5,7 +5,10 @@ import { api } from '../utils/api';
 interface User {
     id: string;
     email: string;
-    name: string;
+    username: string;
+    birth: string;
+    gender: string;
+    email_verified: boolean;
 }
 
 interface AuthResponse {
