@@ -22,12 +22,6 @@ help:
 install:
 	npm install
 
-dev:
-	npm run dev
-
-build:
-	npm run build
-
 typecheck:
 	npm run typecheck
 
@@ -41,14 +35,14 @@ clean:
 	rm -rf dist node_modules/.tmp
 
 # Docker commands
-docker-build:
+build:
 	docker compose build
 
-docker-up:
+up:
 	docker compose up -d
 	@echo "Application is running at http://localhost:8080"
 
-docker-down:
+down:
 	docker compose down
 
 docker-logs:
