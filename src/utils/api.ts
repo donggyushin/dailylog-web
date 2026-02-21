@@ -26,7 +26,7 @@ async function refreshAccessToken(): Promise<boolean> {
                 return false;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/v1/refresh`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/refresh_token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
