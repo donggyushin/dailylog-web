@@ -65,7 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 Cookies.set('refreshToken', authData.refreshToken);
             }
 
-            // setUser(authData.user);
+            // 로그인 성공 후 유저 정보 가져오기
+            const userResponse = await api.me();
+            if (userResponse.data) {
+                setUser(userResponse.data as User);
+            }
+
             return { success: true };
         }
 
@@ -83,7 +88,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 Cookies.set('refreshToken', authData.refreshToken);
             }
 
-            // setUser(authData.user);
+            // 회원가입 성공 후 유저 정보 가져오기
+            const userResponse = await api.me();
+            if (userResponse.data) {
+                setUser(userResponse.data as User);
+            }
+
             return { success: true };
         }
 
