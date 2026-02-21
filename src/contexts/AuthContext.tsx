@@ -1,0 +1,100 @@
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import Cookies from 'js-cookie';
+import { api } from '../utils/api';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 앱 시작 시 쿠키에서 토큰 확인
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = Cookies.get('accessToken');
+
+      if (token) {
+        // 토큰이 있으면 유저 정보 가져오기
+        const { data, error } = await api.me();
+
+        if (data && !error) {
+          setUser(data);
+        } else {
+          // 토큰이 유효하지 않으면 삭제
+          Cookies.remove('accessToken');
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const { data, error } = await api.login(email, password);
+
+    if (data && !error) {
+      // 백엔드에서 쿠키로 토큰을 설정한다고 가정
+      // 만약 응답에 토큰이 포함되어 있다면:
+      if (data.accessToken) {
+        Cookies.set('accessToken', data.accessToken, { expires: 7 }); // 7일
+      }
+
+      setUser(data.user);
+      return { success: true };
+    }
+
+    return { success: false, error: error || 'Login failed' };
+  };
+
+  const signup = async (email: string, password: string, name: string) => {
+    const { data, error } = await api.signup(email, password, name);
+
+    if (data && !error) {
+      // 회원가입 후 자동 로그인
+      if (data.accessToken) {
+        Cookies.set('accessToken', data.accessToken, { expires: 7 });
+      }
+
+      setUser(data.user);
+      return { success: true };
+    }
+
+    return { success: false, error: error || 'Signup failed' };
+  };
+
+  const logout = () => {
+    Cookies.remove('accessToken');
+    setUser(null);
+    api.logout(); // 백엔드에 로그아웃 알림 (옵션)
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+}
