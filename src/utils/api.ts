@@ -141,11 +141,4 @@ export const api = {
     me: async () => {
         return request('/api/v1/me');
     },
-
-    // 로그아웃
-    logout: async () => {
-        return request('/api/logout', {
-            method: 'POST',
-        });
-    },
 };

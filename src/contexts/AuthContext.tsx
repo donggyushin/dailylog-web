@@ -92,8 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
         setUser(null);
-        api.logout(); // 백엔드에 로그아웃 알림 (옵션)
     };
 
     return (

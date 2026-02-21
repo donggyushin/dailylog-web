@@ -1,4 +1,4 @@
-.PHONY: help install dev build lint preview clean docker-build docker-up docker-down docker-logs docker-clean
+.PHONY: help install dev build typecheck lint preview clean docker-build docker-up docker-down docker-logs docker-clean
 
 # Default target
 help:
@@ -6,6 +6,7 @@ help:
 	@echo "  make install       - Install dependencies"
 	@echo "  make dev           - Start development server"
 	@echo "  make build         - Build for production"
+	@echo "  make typecheck     - Run TypeScript type checking"
 	@echo "  make lint          - Run ESLint"
 	@echo "  make preview       - Preview production build"
 	@echo "  make clean         - Clean build artifacts"
@@ -26,6 +27,9 @@ dev:
 
 build:
 	npm run build
+
+typecheck:
+	npm run typecheck
 
 lint:
 	npm run lint
