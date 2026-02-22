@@ -35,6 +35,7 @@ export function ChatPage() {
   const [hasTodayDiary, setHasTodayDiary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isComposingRef = useRef(false);
 
   // 일기 형식 파싱
   const parseDiaryEntry = (content: string) => {
@@ -131,10 +132,20 @@ export function ChatPage() {
     }
   };
 
+  // 한글 조합 시작
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  // 한글 조합 종료
+  const handleCompositionEnd = () => {
+    isComposingRef.current = false;
+  };
+
   // 키 입력 처리 (Shift + Enter = 줄바꿈, Enter = 전송)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // 한글 조합 중일 때는 Enter 키 무시
-    if (e.nativeEvent.isComposing) return;
+    if (isComposingRef.current) return;
 
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -316,6 +327,8 @@ export function ChatPage() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             placeholder="메시지를 입력하세요... (Shift + Enter로 줄바꿈)"
             rows={1}
             className="flex-1 px-4 py-3 border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-bg text-natural-900 dark:text-dark-text placeholder-natural-400 focus:outline-none focus:ring-2 focus:ring-natural-900 dark:focus:ring-dark-border resize-none overflow-hidden"
