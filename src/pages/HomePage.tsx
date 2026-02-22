@@ -92,19 +92,12 @@ function DiaryCardWithThumbnail({
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
 
             {/* 텍스트 오버레이 */}
-            <div className="relative h-full flex flex-col justify-between p-6">
+            <div className="relative h-full flex flex-col p-6">
                 {/* 날짜 - 상단 우측 */}
                 <div className="text-right">
                     <span className={`text-xs font-bold uppercase tracking-wider ${textColorClass} drop-shadow-lg`}>
                         {formatDate(diary.writed_at)}
                     </span>
-                </div>
-
-                {/* 제목 - 하단 */}
-                <div>
-                    <h3 className={`font-serif font-bold text-2xl ${textColorClass} drop-shadow-lg line-clamp-3`}>
-                        {diary.title}
-                    </h3>
                 </div>
             </div>
         </div>

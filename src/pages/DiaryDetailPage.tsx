@@ -154,86 +154,91 @@ export function DiaryDetailPage() {
 
             {/* 메인 콘텐츠 */}
             <main className="max-w-7xl mx-auto px-6 py-12">
-                <DiaryEntry
-                    title={diary.title}
-                    content={diary.content}
-                    createdAt={diary.writed_at}
-                    thumbnailUrl={diary.thumbnail_url}
-                    showSaveButton={false}
-                />
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* 좌측: 일기 내용 */}
+                    <div className="flex-1">
+                        <DiaryEntry
+                            title={diary.title}
+                            content={diary.content}
+                            createdAt={diary.writed_at}
+                            thumbnailUrl={diary.thumbnail_url}
+                            showSaveButton={false}
+                        />
+                    </div>
 
-                {/* 썸네일 생성 섹션 - 일기에 썸네일이 없을 때만 표시 */}
-                {!diary.thumbnail_url && (
-                    <div className="mt-12 border-t-2 border-natural-900 dark:border-dark-border pt-12">
-                        <h2 className="text-2xl font-serif font-bold text-natural-900 dark:text-dark-text mb-6 uppercase tracking-tight">
-                            썸네일 추가
-                        </h2>
+                    {/* 우측: 썸네일 생성 섹션 - 일기에 썸네일이 없을 때만 표시 */}
+                    {!diary.thumbnail_url && (
+                        <div className="w-full lg:w-96 border-l-0 lg:border-l-2 border-t-2 lg:border-t-0 border-natural-900 dark:border-dark-border pt-8 lg:pt-0 lg:pl-8">
+                            <h2 className="text-2xl font-serif font-bold text-natural-900 dark:text-dark-text mb-6 uppercase tracking-tight">
+                                썸네일 추가
+                            </h2>
 
-                        {/* 썸네일 추가하기 버튼 */}
-                        <div className="mb-8">
-                            <Button
-                                onClick={handleGenerateThumbnail}
-                                disabled={isGeneratingThumbnail || generatedThumbnails.length >= 3}
-                                className="w-full md:w-auto"
-                            >
-                                {isGeneratingThumbnail ? '썸네일 생성 중...' : '썸네일 추가하기'}
-                            </Button>
-                            <p className="mt-2 text-sm text-natural-600 dark:text-dark-text font-bold uppercase tracking-wider">
-                                {generatedThumbnails.length} / 3개 생성됨
-                            </p>
-                        </div>
+                            {/* 썸네일 추가하기 버튼 */}
+                            <div className="mb-8">
+                                <Button
+                                    onClick={handleGenerateThumbnail}
+                                    disabled={isGeneratingThumbnail || generatedThumbnails.length >= 3}
+                                    className="w-full"
+                                >
+                                    {isGeneratingThumbnail ? '썸네일 생성 중...' : '썸네일 추가하기'}
+                                </Button>
+                                <p className="mt-2 text-sm text-natural-600 dark:text-dark-text font-bold uppercase tracking-wider">
+                                    {generatedThumbnails.length} / 3개 생성됨
+                                </p>
+                            </div>
 
-                        {/* 생성된 썸네일이 있을 때 */}
-                        {generatedThumbnails.length > 0 && (
-                            <div className="grid md:grid-cols-2 gap-8">
-                                {/* 선택된 썸네일 크게 보기 */}
-                                <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
-                                    <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
-                                        선택된 이미지
-                                    </p>
-                                    <img
-                                        src={generatedThumbnails[selectedThumbnailIndex]}
-                                        alt="선택된 썸네일"
-                                        className="w-full h-auto border-2 border-natural-900 dark:border-dark-border"
-                                    />
-                                    <Button
-                                        onClick={handleApplyThumbnail}
-                                        disabled={isUpdatingThumbnail}
-                                        className="w-full mt-4"
-                                    >
-                                        {isUpdatingThumbnail ? '적용 중...' : '이 이미지로 일기 썸네일 지정하기'}
-                                    </Button>
-                                </div>
+                            {/* 생성된 썸네일이 있을 때 */}
+                            {generatedThumbnails.length > 0 && (
+                                <div className="space-y-6">
+                                    {/* 선택된 썸네일 크게 보기 */}
+                                    <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
+                                            선택된 이미지
+                                        </p>
+                                        <img
+                                            src={generatedThumbnails[selectedThumbnailIndex]}
+                                            alt="선택된 썸네일"
+                                            className="w-full h-auto border-2 border-natural-900 dark:border-dark-border"
+                                        />
+                                        <Button
+                                            onClick={handleApplyThumbnail}
+                                            disabled={isUpdatingThumbnail}
+                                            className="w-full mt-4"
+                                        >
+                                            {isUpdatingThumbnail ? '적용 중...' : '이 이미지로 일기 썸네일 지정하기'}
+                                        </Button>
+                                    </div>
 
-                                {/* 썸네일 그리드 */}
-                                <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
-                                    <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
-                                        생성된 썸네일들
-                                    </p>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {generatedThumbnails.map((thumbnail, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => setSelectedThumbnailIndex(index)}
-                                                className={`border-2 ${
-                                                    selectedThumbnailIndex === index
-                                                        ? 'border-natural-900 dark:border-dark-text'
-                                                        : 'border-natural-400 dark:border-natural-600'
-                                                } hover:border-natural-900 dark:hover:border-dark-text transition-colors`}
-                                            >
-                                                <img
-                                                    src={thumbnail}
-                                                    alt={`썸네일 ${index + 1}`}
-                                                    className="w-full h-auto"
-                                                />
-                                            </button>
-                                        ))}
+                                    {/* 썸네일 그리드 */}
+                                    <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
+                                            생성된 썸네일들
+                                        </p>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {generatedThumbnails.map((thumbnail, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => setSelectedThumbnailIndex(index)}
+                                                    className={`border-2 ${
+                                                        selectedThumbnailIndex === index
+                                                            ? 'border-natural-900 dark:border-dark-text'
+                                                            : 'border-natural-400 dark:border-natural-600'
+                                                    } hover:border-natural-900 dark:hover:border-dark-text transition-colors`}
+                                                >
+                                                    <img
+                                                        src={thumbnail}
+                                                        alt={`썸네일 ${index + 1}`}
+                                                        className="w-full h-auto"
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    )}
+                </div>
             </main>
         </div>
     );
