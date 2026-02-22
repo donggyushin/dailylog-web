@@ -3,6 +3,7 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { HomePage } from './pages/HomePage';
 import { ChatPage } from './pages/ChatPage';
+import { DiaryDetailPage } from './pages/DiaryDetailPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { GuestRoute } from './components/GuestRoute';
 
@@ -39,6 +40,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary/:id"
+          element={
+            <ProtectedRoute>
+              <DiaryDetailPage />
             </ProtectedRoute>
           }
         />

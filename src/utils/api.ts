@@ -190,5 +190,15 @@ export const api = {
             const queryString = params.toString();
             return request(`/api/v1/diaries${queryString ? `?${queryString}` : ''}`);
         },
+
+        // 일기 상세 조회
+        getById: async (diaryId: string) => {
+            return request(`/api/v1/diary/${diaryId}`);
+        },
+
+        // 특정 날짜의 일기 조회
+        getByDate: async (date: string) => {
+            return request(`/api/v1/diary?writed_at=${date}`);
+        },
     },
 };

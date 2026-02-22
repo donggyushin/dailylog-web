@@ -4,12 +4,23 @@ interface DiaryEntryProps {
   title: string;
   content: string;
   createdAt: string;
-  messageId: string;
-  onSaveDiary: (messageId: string) => void;
+  messageId?: string;
+  onSaveDiary?: (messageId: string) => void;
   isSaving?: boolean;
+  showSaveButton?: boolean;
+  thumbnailUrl?: string;
 }
 
-export function DiaryEntry({ title, content, createdAt, messageId, onSaveDiary, isSaving = false }: DiaryEntryProps) {
+export function DiaryEntry({
+  title,
+  content,
+  createdAt,
+  messageId,
+  onSaveDiary,
+  isSaving = false,
+  showSaveButton = true,
+  thumbnailUrl
+}: DiaryEntryProps) {
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -31,6 +42,19 @@ export function DiaryEntry({ title, content, createdAt, messageId, onSaveDiary, 
 
         {/* 구분선 */}
         <div className="border-t-2 border-natural-900 dark:border-dark-border mb-8"></div>
+
+        {/* 썸네일 (있는 경우) */}
+        {thumbnailUrl && (
+          <div className="mb-8">
+            <div className="border-2 border-natural-900 dark:border-dark-border overflow-hidden">
+              <img
+                src={thumbnailUrl}
+                alt={title}
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+        )}
 
         {/* 제목 */}
         <h2 className="font-serif font-bold text-3xl md:text-4xl text-center text-natural-900 dark:text-dark-text mb-8 leading-tight">
@@ -62,16 +86,18 @@ export function DiaryEntry({ title, content, createdAt, messageId, onSaveDiary, 
         </div>
       </div>
 
-      {/* 일기 저장 버튼 */}
-      <div className="mt-6 flex justify-center">
-        <Button
-          onClick={() => onSaveDiary(messageId)}
-          disabled={isSaving}
-          className="px-8 py-4 text-lg"
-        >
-          {isSaving ? '저장 중...' : '이대로 일기 작성하기'}
-        </Button>
-      </div>
+      {/* 일기 저장 버튼 (선택적 표시) */}
+      {showSaveButton && messageId && onSaveDiary && (
+        <div className="mt-6 flex justify-center">
+          <Button
+            onClick={() => onSaveDiary(messageId)}
+            disabled={isSaving}
+            className="px-8 py-4 text-lg"
+          >
+            {isSaving ? '저장 중...' : '이대로 일기 작성하기'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

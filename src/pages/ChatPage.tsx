@@ -32,6 +32,7 @@ export function ChatPage() {
   const [isSending, setIsSending] = useState(false);
   const [isDiaryWritten, setIsDiaryWritten] = useState(false);
   const [isSavingDiary, setIsSavingDiary] = useState(false);
+  const [hasTodayDiary, setHasTodayDiary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -56,10 +57,25 @@ export function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 세션 로드
+  // 세션 로드 전 오늘 일기 확인
   useEffect(() => {
-    const loadSession = async () => {
+    const checkTodayDiaryAndLoadSession = async () => {
       setIsLoading(true);
+
+      // 오늘 날짜 (YYYY-MM-DD 형식)
+      const today = new Date().toISOString().split('T')[0];
+
+      // 오늘 일기가 있는지 확인
+      const { data: diaryData, error: diaryError } = await api.diary.getByDate(today);
+
+      // 정상 응답이 왔다면 (이미 오늘 일기를 작성함)
+      if (diaryData && !diaryError) {
+        setHasTodayDiary(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // 오늘 일기가 없으면 세션 로드
       const { data, error } = await api.chat.getCurrentSession();
 
       if (data && !error) {
@@ -75,7 +91,7 @@ export function ChatPage() {
       setIsLoading(false);
     };
 
-    loadSession();
+    checkTodayDiaryAndLoadSession();
   }, []);
 
   // 메시지 변경 시 스크롤 & 일기 작성 여부 확인
@@ -174,6 +190,27 @@ export function ChatPage() {
       <div className="min-h-screen bg-accent-cream dark:bg-dark-bg flex items-center justify-center">
         <div className="text-natural-900 dark:text-dark-text font-bold uppercase tracking-wider">
           로딩 중...
+        </div>
+      </div>
+    );
+  }
+
+  // 오늘 이미 일기를 작성한 경우
+  if (hasTodayDiary) {
+    return (
+      <div className="min-h-screen bg-accent-cream dark:bg-dark-bg flex items-center justify-center">
+        <div className="max-w-md mx-auto px-6 text-center">
+          <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-8">
+            <h2 className="font-serif font-bold text-2xl text-natural-900 dark:text-dark-text mb-4">
+              오늘은 이미 일기를 작성했어요
+            </h2>
+            <p className="text-natural-600 dark:text-dark-text/80 mb-6">
+              내일 또 만나요!
+            </p>
+            <Button onClick={() => navigate('/')}>
+              홈으로 돌아가기
+            </Button>
+          </div>
         </div>
       </div>
     );

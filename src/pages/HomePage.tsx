@@ -109,6 +109,7 @@ export function HomePage() {
                         {diaries.map((diary) => (
                             <div
                                 key={diary.id}
+                                onClick={() => navigate(`/diary/${diary.id}`)}
                                 className="bg-white dark:bg-dark-card border-2 border-natural-900 dark:border-dark-border p-6 flex flex-col min-h-[300px] cursor-pointer hover:bg-natural-50 dark:hover:bg-natural-900/20 transition-colors"
                             >
                                 {/* 날짜 */}
