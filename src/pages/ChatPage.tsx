@@ -133,6 +133,9 @@ export function ChatPage() {
 
   // 키 입력 처리 (Shift + Enter = 줄바꿈, Enter = 전송)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // 한글 조합 중일 때는 Enter 키 무시
+    if (e.nativeEvent.isComposing) return;
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(e);
