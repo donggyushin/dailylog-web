@@ -3,19 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DiaryEntry } from '../components/DiaryEntry';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { Button } from '../components/ui/Button';
-import { api } from '../utils/api';
-
-interface Diary {
-    id: string;
-    user_id: string;
-    chat_session_id: string;
-    title: string;
-    content: string;
-    writed_at: string;
-    thumbnail_url?: string;
-    created_at: string;
-    updated_at: string;
-}
+import { api, type Diary } from '../utils/api';
 
 export function DiaryDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -42,7 +30,7 @@ export function DiaryDetailPage() {
             if (error) {
                 setError(error);
             } else if (data) {
-                setDiary(data as Diary);
+                setDiary(data);
             }
 
             setIsLoading(false);
@@ -79,7 +67,7 @@ export function DiaryDetailPage() {
         if (error) {
             alert('썸네일 적용에 실패했습니다: ' + error);
         } else if (data) {
-            setDiary(data as Diary);
+            setDiary(data);
             alert('썸네일이 성공적으로 적용되었습니다.');
         }
 

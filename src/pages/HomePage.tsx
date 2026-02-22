@@ -3,19 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
-import { api } from '../utils/api';
-
-interface Diary {
-    id: string;
-    user_id: string;
-    chat_session_id: string;
-    title: string;
-    content: string;
-    writed_at: string;
-    thumbnail_url: string;
-    created_at: string;
-    updated_at: string;
-}
+import { api, type Diary } from '../utils/api';
 
 // 이미지 밝기를 계산하는 함수
 const calculateImageBrightness = (imageUrl: string): Promise<'light' | 'dark'> => {
@@ -142,7 +130,7 @@ export function HomePage() {
             const { data, error } = await api.diary.list();
 
             if (data && !error) {
-                setDiaries(data as Diary[]);
+                setDiaries(data);
             }
 
             setIsLoading(false);

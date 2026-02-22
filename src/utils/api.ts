@@ -7,6 +7,23 @@ interface ApiResponse<T = any> {
     error?: string;
 }
 
+// API response types
+interface ThumbnailResponse {
+    img_url: string;
+}
+
+export interface Diary {
+    id: string;
+    user_id: string;
+    chat_session_id: string;
+    title: string;
+    content: string;
+    writed_at: string;
+    thumbnail_url?: string;
+    created_at: string;
+    updated_at: string;
+}
+
 // 토큰 갱신 중인지 추적 (중복 요청 방지)
 let isRefreshing = false;
 let refreshPromise: Promise<boolean> | null = null;
@@ -188,12 +205,12 @@ export const api = {
             params.append('size', size.toString());
 
             const queryString = params.toString();
-            return request(`/api/v1/diaries${queryString ? `?${queryString}` : ''}`);
+            return request<Diary[]>(`/api/v1/diaries${queryString ? `?${queryString}` : ''}`);
         },
 
         // 일기 상세 조회
         getById: async (diaryId: string) => {
-            return request(`/api/v1/diary/${diaryId}`);
+            return request<Diary>(`/api/v1/diary/${diaryId}`);
         },
 
         // 특정 날짜의 일기 조회
@@ -203,12 +220,12 @@ export const api = {
 
         // 썸네일 생성 요청
         getThumbnail: async (diaryId: string) => {
-            return request(`/api/v1/diary/thumbnail/${diaryId}`);
+            return request<ThumbnailResponse>(`/api/v1/diary/thumbnail/${diaryId}`);
         },
 
         // 일기에 썸네일 적용
         updateThumbnail: async (diaryId: string, imgUrl: string) => {
-            return request(`/api/v1/diary/${diaryId}/thumbnail`, {
+            return request<Diary>(`/api/v1/diary/${diaryId}/thumbnail`, {
                 method: 'PATCH',
                 body: JSON.stringify({ img_url: imgUrl }),
             });

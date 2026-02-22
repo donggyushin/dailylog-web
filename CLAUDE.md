@@ -25,6 +25,9 @@ This is a React + TypeScript web application built with Vite. The backend is alr
 # Development server with hot module replacement (Port 5173)
 npm run dev
 
+# TypeScript type checking (without building)
+npm run typecheck
+
 # Production build (runs TypeScript compiler check first, then builds)
 npm run build
 
@@ -38,16 +41,17 @@ npm run lint
 ### Makefile Commands (Recommended)
 ```bash
 # Development
-make dev            # Start development server
-make build          # Build for production
+make install        # Install dependencies
+make typecheck      # Run TypeScript type checking
 make lint           # Run linter
+make clean          # Clean build artifacts
 
 # Docker (Production - Port 8080)
-make docker-build   # Build Docker image
-make docker-up      # Start container in background
-make docker-down    # Stop container
+make build          # Build Docker image (docker compose build)
+make up             # Start container in background
+make down           # Stop container
 make docker-logs    # View container logs
-make docker-clean   # Remove all Docker artifacts
+make docker-clean   # Remove Docker image and container
 ```
 
 ## Environment Variables
