@@ -141,4 +141,27 @@ export const api = {
     me: async () => {
         return request('/api/v1/me');
     },
+
+    // 채팅 세션 관련 API
+    chat: {
+        // 현재 채팅 세션 가져오기
+        getCurrentSession: async () => {
+            return request('/api/v1/chat-current-session');
+        },
+
+        // 메시지 전송
+        sendMessage: async (sessionId: string, userId: string, content: string) => {
+            return request('/api/v1/chat/message', {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message: {
+                        user_id: userId,
+                        role: 'USER',
+                        content,
+                    },
+                }),
+            });
+        },
+    },
 };
