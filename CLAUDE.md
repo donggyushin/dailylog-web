@@ -75,7 +75,9 @@ src/
 │   │   ├── Button.tsx        # Button component (brutalist design)
 │   │   ├── Input.tsx         # Input component with labels
 │   │   └── ThemeToggle.tsx   # Theme switcher (light/dark mode)
-│   └── ProtectedRoute.tsx    # Route guard for authenticated pages
+│   ├── DiaryEntry.tsx        # Diary entry display component (journal-style UI)
+│   ├── ProtectedRoute.tsx    # Route guard for authenticated pages
+│   └── GuestRoute.tsx        # Route guard for guest-only pages (login/signup)
 ├── contexts/         # React Context providers
 │   ├── AuthContext.tsx       # Authentication state management
 │   └── ThemeContext.tsx      # Theme state management (light/dark)
@@ -83,6 +85,7 @@ src/
 │   ├── LoginPage.tsx         # Login page
 │   ├── SignupPage.tsx        # Signup page
 │   ├── HomePage.tsx          # Main dashboard (authenticated)
+│   ├── ChatPage.tsx          # AI chat conversation page
 │   ├── AuthPages.css         # Login/Signup styles
 │   └── HomePage.css          # Home page styles
 ├── utils/            # Utility functions
@@ -93,15 +96,56 @@ src/
 └── assets/           # Static assets
 ```
 
-## Authentication
+## Core Features & Architecture
+
+### Authentication Flow
 
 - **Cookie-based authentication**: Uses `js-cookie` to manage `accessToken` and `refreshToken` in cookies
-- **Automatic token refresh**: When API returns 401, automatically calls `/api/v1/refresh` to renew tokens
+- **Automatic token refresh**: When API returns 401, automatically calls `/api/v1/refresh_token` to renew tokens
 - **Retry logic**: Failed requests are retried once after successful token refresh
 - **Auto-logout**: If token refresh fails, automatically logs out the user
 - **Protected routes**: Unauthenticated users are automatically redirected to `/login`
+- **Guest routes**: Authenticated users accessing `/login` or `/signup` are redirected to `/`
 - **AuthContext**: Global authentication state accessible via `useAuth()` hook
 - **API integration**: All API calls automatically include authentication headers
+
+### Diary Creation Workflow
+
+The app follows a 3-step process for creating diary entries:
+
+1. **Chat Conversation** (`/chat`):
+   - User has a conversation with AI assistant about their day
+   - Messages are sent via `POST /api/v1/chat/message` with session context
+   - Chat session is loaded from `GET /api/v1/chat-current-session`
+   - SYSTEM role messages are filtered out from UI display
+
+2. **AI Diary Generation**:
+   - AI generates a literary diary entry in a special format:
+     ```
+     [TITLE_START]
+     Diary Title
+     [TITLE_END]
+
+     [CONTENT_START]
+     Diary content...
+     [CONTENT_END]
+     ```
+   - When this format is detected, the `DiaryEntry` component renders a journal-style UI
+   - Once diary is generated, chat input is disabled (session ends)
+
+3. **Diary Saving**:
+   - User clicks "이대로 일기 작성하기" button
+   - Calls `POST /api/v1/diary` with `session_id` and `message_id`
+   - Automatically navigates to home page after successful save
+
+### API Organization (`src/utils/api.ts`)
+
+The API layer is organized into namespaces:
+
+- `api.login()`, `api.signup()`, `api.me()` - Authentication endpoints
+- `api.chat.getCurrentSession()` - Get current chat session
+- `api.chat.sendMessage()` - Send chat message (requires session_id, user_id, content)
+- `api.diary.create()` - Create diary from chat message (requires session_id, message_id)
 
 ## TypeScript Configuration
 
@@ -202,6 +246,22 @@ dark: {
 - **Primary language**: Korean (한국어)
 - All UI text, error messages, and user-facing content should be in Korean
 - Keep the service name "Daily Log" in English as the brand name
+
+### Chat Interface UX Patterns
+
+When working with the ChatPage component:
+
+- **Textarea auto-resize**: Input expands vertically (max 12rem) as user types
+- **Keyboard shortcuts**:
+  - `Enter` = Send message
+  - `Shift + Enter` = Line break
+- **Message sending**:
+  - User message appears immediately in UI
+  - Loading indicator (bouncing dots) shows while AI responds
+  - Textarea resets to original height after sending
+- **Focus management**: Input stays focused during AI response (only send button disables)
+- **Diary detection**: Chat automatically detects `[TITLE_START]...[TITLE_END]` and `[CONTENT_START]...[CONTENT_END]` tags
+- **Session termination**: Once diary is generated, input is disabled to prevent further messages
 
 ## Development Notes
 

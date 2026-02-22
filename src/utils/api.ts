@@ -156,10 +156,25 @@ export const api = {
                 body: JSON.stringify({
                     session_id: sessionId,
                     message: {
+                        id: '',
                         user_id: userId,
                         role: 'USER',
                         content,
                     },
+                }),
+            });
+        },
+    },
+
+    // 일기 작성 API
+    diary: {
+        // 일기 작성
+        create: async (sessionId: string, messageId: string) => {
+            return request('/api/v1/diary', {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message_id: messageId,
                 }),
             });
         },
