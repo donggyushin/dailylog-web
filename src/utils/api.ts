@@ -178,5 +178,17 @@ export const api = {
                 }),
             });
         },
+
+        // 일기 리스트 조회
+        list: async (cursorId?: string, size: number = 30) => {
+            const params = new URLSearchParams();
+            if (cursorId) {
+                params.append('cursor_id', cursorId);
+            }
+            params.append('size', size.toString());
+
+            const queryString = params.toString();
+            return request(`/api/v1/diaries${queryString ? `?${queryString}` : ''}`);
+        },
     },
 };
