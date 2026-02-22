@@ -230,5 +230,12 @@ export const api = {
                 body: JSON.stringify({ img_url: imgUrl }),
             });
         },
+
+        // 일기 삭제
+        delete: async (diaryId: string) => {
+            return request(`/api/v1/diary/${diaryId}`, {
+                method: 'DELETE',
+            });
+        },
     },
 };

@@ -15,6 +15,7 @@ export function DiaryDetailPage() {
     const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState<number>(0);
     const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false);
     const [isUpdatingThumbnail, setIsUpdatingThumbnail] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const loadDiary = async () => {
@@ -74,6 +75,24 @@ export function DiaryDetailPage() {
         setIsUpdatingThumbnail(false);
     };
 
+    const handleDelete = async () => {
+        if (!id) return;
+
+        const confirmed = window.confirm('정말로 이 일기를 삭제하시겠습니까?');
+        if (!confirmed) return;
+
+        setIsDeleting(true);
+        const { error } = await api.diary.delete(id);
+
+        if (error) {
+            alert('일기 삭제에 실패했습니다: ' + error);
+            setIsDeleting(false);
+        } else {
+            alert('일기가 삭제되었습니다.');
+            navigate('/');
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="min-h-screen bg-accent-cream dark:bg-dark-bg flex items-center justify-center">
@@ -112,13 +131,24 @@ export function DiaryDetailPage() {
                     >
                         Daily Log
                     </button>
-                    <Button
-                        onClick={() => navigate('/')}
-                        variant="outline"
-                        size="sm"
-                    >
-                        ← 목록으로
-                    </Button>
+                    <div className="flex gap-4">
+                        <Button
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            variant="outline"
+                            size="sm"
+                            className="border-red-600 dark:border-red-500 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white"
+                        >
+                            {isDeleting ? '삭제 중...' : '삭제'}
+                        </Button>
+                        <Button
+                            onClick={() => navigate('/')}
+                            variant="outline"
+                            size="sm"
+                        >
+                            ← 목록으로
+                        </Button>
+                    </div>
                 </div>
             </header>
 
