@@ -143,7 +143,8 @@ export function ChatPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!inputMessage.trim() || !user || !session) return;
+    // 중복 전송 방지: 이미 전송 중이면 무시
+    if (isSending || !inputMessage.trim() || !user || !session) return;
 
     const userMessage: Message = {
       id: 'temp-' + Date.now(),
