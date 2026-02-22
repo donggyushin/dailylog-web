@@ -200,5 +200,18 @@ export const api = {
         getByDate: async (date: string) => {
             return request(`/api/v1/diary?writed_at=${date}`);
         },
+
+        // 썸네일 생성 요청
+        getThumbnail: async (diaryId: string) => {
+            return request(`/api/v1/diary/thumbnail/${diaryId}`);
+        },
+
+        // 일기에 썸네일 적용
+        updateThumbnail: async (diaryId: string, imgUrl: string) => {
+            return request(`/api/v1/diary/${diaryId}/thumbnail`, {
+                method: 'PATCH',
+                body: JSON.stringify({ img_url: imgUrl }),
+            });
+        },
     },
 };

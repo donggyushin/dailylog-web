@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
@@ -15,6 +15,112 @@ interface Diary {
     thumbnail_url: string;
     created_at: string;
     updated_at: string;
+}
+
+// 이미지 밝기를 계산하는 함수
+const calculateImageBrightness = (imageUrl: string): Promise<'light' | 'dark'> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (!ctx) {
+                resolve('dark'); // 기본값
+                return;
+            }
+
+            canvas.width = 50;
+            canvas.height = 50;
+            ctx.drawImage(img, 0, 0, 50, 50);
+
+            try {
+                const imageData = ctx.getImageData(0, 0, 50, 50);
+                const data = imageData.data;
+                let totalBrightness = 0;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+                    totalBrightness += brightness;
+                }
+
+                const avgBrightness = totalBrightness / (data.length / 4);
+                resolve(avgBrightness > 128 ? 'light' : 'dark');
+            } catch {
+                resolve('dark'); // CORS 에러 시 기본값
+            }
+        };
+
+        img.onerror = () => {
+            resolve('dark'); // 에러 시 기본값
+        };
+
+        img.src = imageUrl;
+    });
+};
+
+// 썸네일이 있는 일기 카드 컴포넌트
+function DiaryCardWithThumbnail({
+    diary,
+    onClick,
+    formatDate
+}: {
+    diary: Diary;
+    onClick: () => void;
+    formatDate: (date: string) => string;
+}) {
+    const [textColor, setTextColor] = useState<'light' | 'dark'>('dark');
+    const imgRef = useRef<HTMLImageElement>(null);
+
+    useEffect(() => {
+        if (diary.thumbnail_url) {
+            calculateImageBrightness(diary.thumbnail_url).then(setTextColor);
+        }
+    }, [diary.thumbnail_url]);
+
+    const textColorClass = textColor === 'light'
+        ? 'text-natural-900'
+        : 'text-white';
+
+    return (
+        <div
+            onClick={onClick}
+            className="relative border-2 border-natural-900 dark:border-dark-border min-h-[300px] cursor-pointer overflow-hidden group"
+        >
+            {/* 썸네일 이미지 - 카드 전체를 채움 */}
+            <img
+                ref={imgRef}
+                src={diary.thumbnail_url}
+                alt={diary.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+            />
+
+            {/* 그라데이션 오버레이 - 텍스트 가독성 향상 */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
+
+            {/* 텍스트 오버레이 */}
+            <div className="relative h-full flex flex-col justify-between p-6">
+                {/* 날짜 - 상단 우측 */}
+                <div className="text-right">
+                    <span className={`text-xs font-bold uppercase tracking-wider ${textColorClass} drop-shadow-lg`}>
+                        {formatDate(diary.writed_at)}
+                    </span>
+                </div>
+
+                {/* 제목 - 하단 */}
+                <div>
+                    <h3 className={`font-serif font-bold text-2xl ${textColorClass} drop-shadow-lg line-clamp-3`}>
+                        {diary.title}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export function HomePage() {
@@ -107,54 +213,44 @@ export function HomePage() {
 
                         {/* 일기 리스트 */}
                         {diaries.map((diary) => (
-                            <div
-                                key={diary.id}
-                                onClick={() => navigate(`/diary/${diary.id}`)}
-                                className="bg-white dark:bg-dark-card border-2 border-natural-900 dark:border-dark-border p-6 flex flex-col min-h-[300px] cursor-pointer hover:bg-natural-50 dark:hover:bg-natural-900/20 transition-colors"
-                            >
-                                {/* 날짜 */}
-                                <div className="text-right mb-4">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-natural-600 dark:text-natural-400">
-                                        {formatDate(diary.writed_at)}
-                                    </span>
+                            diary.thumbnail_url ? (
+                                <DiaryCardWithThumbnail
+                                    key={diary.id}
+                                    diary={diary}
+                                    onClick={() => navigate(`/diary/${diary.id}`)}
+                                    formatDate={formatDate}
+                                />
+                            ) : (
+                                <div
+                                    key={diary.id}
+                                    onClick={() => navigate(`/diary/${diary.id}`)}
+                                    className="bg-white dark:bg-dark-card border-2 border-natural-900 dark:border-dark-border p-6 flex flex-col min-h-[300px] cursor-pointer hover:bg-natural-50 dark:hover:bg-natural-900/20 transition-colors"
+                                >
+                                    {/* 날짜 */}
+                                    <div className="text-right mb-4">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-natural-600 dark:text-natural-400">
+                                            {formatDate(diary.writed_at)}
+                                        </span>
+                                    </div>
+
+                                    {/* 제목 */}
+                                    <h3 className="font-serif font-bold text-xl text-natural-900 dark:text-dark-text mb-3 line-clamp-2">
+                                        {diary.title}
+                                    </h3>
+
+                                    {/* 본문 미리보기 */}
+                                    <p className="text-natural-600 dark:text-dark-text/80 text-sm line-clamp-3 flex-1">
+                                        {diary.content}
+                                    </p>
+
+                                    {/* 하단 구분선 */}
+                                    <div className="mt-4 pt-4 border-t-2 border-natural-900 dark:border-dark-border">
+                                        <span className="text-xs font-bold uppercase tracking-widest text-natural-600 dark:text-natural-400">
+                                            더 읽기 →
+                                        </span>
+                                    </div>
                                 </div>
-
-                                {/* 썸네일이 있는 경우 */}
-                                {diary.thumbnail_url ? (
-                                    <>
-                                        <div className="mb-4 border-2 border-natural-900 dark:border-dark-border overflow-hidden aspect-video flex-1">
-                                            <img
-                                                src={diary.thumbnail_url}
-                                                alt={diary.title}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        {/* 제목만 표시 */}
-                                        <h3 className="font-serif font-bold text-xl text-natural-900 dark:text-dark-text line-clamp-2">
-                                            {diary.title}
-                                        </h3>
-                                    </>
-                                ) : (
-                                    <>
-                                        {/* 제목 */}
-                                        <h3 className="font-serif font-bold text-xl text-natural-900 dark:text-dark-text mb-3 line-clamp-2">
-                                            {diary.title}
-                                        </h3>
-
-                                        {/* 본문 미리보기 */}
-                                        <p className="text-natural-600 dark:text-dark-text/80 text-sm line-clamp-3 flex-1">
-                                            {diary.content}
-                                        </p>
-
-                                        {/* 하단 구분선 */}
-                                        <div className="mt-4 pt-4 border-t-2 border-natural-900 dark:border-dark-border">
-                                            <span className="text-xs font-bold uppercase tracking-widest text-natural-600 dark:text-natural-400">
-                                                더 읽기 →
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                            )
                         ))}
                     </div>
                 )}

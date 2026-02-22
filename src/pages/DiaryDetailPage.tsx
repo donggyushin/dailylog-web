@@ -23,6 +23,10 @@ export function DiaryDetailPage() {
     const [diary, setDiary] = useState<Diary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [generatedThumbnails, setGeneratedThumbnails] = useState<string[]>([]);
+    const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState<number>(0);
+    const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false);
+    const [isUpdatingThumbnail, setIsUpdatingThumbnail] = useState(false);
 
     useEffect(() => {
         const loadDiary = async () => {
@@ -46,6 +50,41 @@ export function DiaryDetailPage() {
 
         loadDiary();
     }, [id]);
+
+    const handleGenerateThumbnail = async () => {
+        if (!id || generatedThumbnails.length >= 3) return;
+
+        setIsGeneratingThumbnail(true);
+        const { data, error } = await api.diary.getThumbnail(id);
+
+        if (error) {
+            alert('썸네일 생성에 실패했습니다: ' + error);
+        } else if (data && data.img_url) {
+            setGeneratedThumbnails(prev => [...prev, data.img_url]);
+            // 새로 생성된 썸네일을 자동으로 선택
+            setSelectedThumbnailIndex(generatedThumbnails.length);
+        }
+
+        setIsGeneratingThumbnail(false);
+    };
+
+    const handleApplyThumbnail = async () => {
+        if (!id || generatedThumbnails.length === 0) return;
+
+        const selectedImageUrl = generatedThumbnails[selectedThumbnailIndex];
+        setIsUpdatingThumbnail(true);
+
+        const { data, error } = await api.diary.updateThumbnail(id, selectedImageUrl);
+
+        if (error) {
+            alert('썸네일 적용에 실패했습니다: ' + error);
+        } else if (data) {
+            setDiary(data as Diary);
+            alert('썸네일이 성공적으로 적용되었습니다.');
+        }
+
+        setIsUpdatingThumbnail(false);
+    };
 
     if (isLoading) {
         return (
@@ -104,6 +143,79 @@ export function DiaryDetailPage() {
                     thumbnailUrl={diary.thumbnail_url}
                     showSaveButton={false}
                 />
+
+                {/* 썸네일 생성 섹션 - 일기에 썸네일이 없을 때만 표시 */}
+                {!diary.thumbnail_url && (
+                    <div className="mt-12 border-t-2 border-natural-900 dark:border-dark-border pt-12">
+                        <h2 className="text-2xl font-serif font-bold text-natural-900 dark:text-dark-text mb-6 uppercase tracking-tight">
+                            썸네일 추가
+                        </h2>
+
+                        {/* 썸네일 추가하기 버튼 */}
+                        <div className="mb-8">
+                            <Button
+                                onClick={handleGenerateThumbnail}
+                                disabled={isGeneratingThumbnail || generatedThumbnails.length >= 3}
+                                className="w-full md:w-auto"
+                            >
+                                {isGeneratingThumbnail ? '썸네일 생성 중...' : '썸네일 추가하기'}
+                            </Button>
+                            <p className="mt-2 text-sm text-natural-600 dark:text-dark-text font-bold uppercase tracking-wider">
+                                {generatedThumbnails.length} / 3개 생성됨
+                            </p>
+                        </div>
+
+                        {/* 생성된 썸네일이 있을 때 */}
+                        {generatedThumbnails.length > 0 && (
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {/* 선택된 썸네일 크게 보기 */}
+                                <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
+                                    <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
+                                        선택된 이미지
+                                    </p>
+                                    <img
+                                        src={generatedThumbnails[selectedThumbnailIndex]}
+                                        alt="선택된 썸네일"
+                                        className="w-full h-auto border-2 border-natural-900 dark:border-dark-border"
+                                    />
+                                    <Button
+                                        onClick={handleApplyThumbnail}
+                                        disabled={isUpdatingThumbnail}
+                                        className="w-full mt-4"
+                                    >
+                                        {isUpdatingThumbnail ? '적용 중...' : '이 이미지로 일기 썸네일 지정하기'}
+                                    </Button>
+                                </div>
+
+                                {/* 썸네일 그리드 */}
+                                <div className="border-2 border-natural-900 dark:border-dark-border bg-white dark:bg-dark-card p-4">
+                                    <p className="text-sm font-bold uppercase tracking-wider text-natural-600 dark:text-dark-text mb-4">
+                                        생성된 썸네일들
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {generatedThumbnails.map((thumbnail, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setSelectedThumbnailIndex(index)}
+                                                className={`border-2 ${
+                                                    selectedThumbnailIndex === index
+                                                        ? 'border-natural-900 dark:border-dark-text'
+                                                        : 'border-natural-400 dark:border-natural-600'
+                                                } hover:border-natural-900 dark:hover:border-dark-text transition-colors`}
+                                            >
+                                                <img
+                                                    src={thumbnail}
+                                                    alt={`썸네일 ${index + 1}`}
+                                                    className="w-full h-auto"
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </main>
         </div>
     );
